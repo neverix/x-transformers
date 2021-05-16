@@ -762,7 +762,7 @@ class TransformerWrapper(nn.Module):
         if return_mems:
             hiddens = intermediates.hiddens
             new_mems = list(map(lambda pair: torch.cat(pair, dim = -2), zip(mems, hiddens))) if exists(mems) else hiddens
-            new_mems = list(map(lambda t: t[..., -self.max_mem_len:, :].detach(), new_mems))
+            new_mems = list(map(lambda t: t[..., :, :], new_mems))
             return out, new_mems
 
         if return_attn:
