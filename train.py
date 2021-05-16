@@ -95,7 +95,7 @@ for i in tqdm.tqdm(range(NUM_BATCHES), mininterval=10., desc='training'):
         # loss = loss[-1]
 
     print(f'training loss: {loss[-1].item()}')
-    krt.append((loss[-1].item(), torch.sum(loss).item()))
+    krt.append([l.item() for l in loss])
     loss = loss[-1]
     open(f"loss-{sys.argv[1]}.txt", 'w').write(str(krt))
     torch.nn.utils.clip_grad_norm_(model.parameters(), 0.5)

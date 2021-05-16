@@ -591,7 +591,7 @@ class AttentionLayers(nn.Module):
             x = residual_fn(out, residual)
 
             if layer_type in ('a', 'c'):
-                intermediates.append(inter)
+                intermediates.append(x)
 
             if layer_type == 'a' and self.residual_attn:
                 prev_attn = inter.pre_softmax_attn
