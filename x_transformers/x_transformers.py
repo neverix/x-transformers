@@ -576,6 +576,7 @@ class AttentionLayers(nn.Module):
                 hiddens.append(x)
                 layer_mem = mems.pop(0)
 
+            x = x.detach()
             residual = x
 
             if self.pre_norm:
