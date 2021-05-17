@@ -590,6 +590,9 @@ class AttentionLayers(nn.Module):
 
             x = residual_fn(out, residual)
 
+            if not self.pre_norm:
+                x = norm(x)
+
             if layer_type in ('a', 'c'):
                 intermediates.append(x)
 
@@ -597,9 +600,6 @@ class AttentionLayers(nn.Module):
                 prev_attn = inter.pre_softmax_attn
             elif layer_type == 'c' and self.cross_residual_attn:
                 prev_cross_attn = inter.pre_softmax_attn
-
-            if not self.pre_norm and not is_last:
-                x = norm(x)
 
         if return_hiddens:
             intermediates = LayerIntermediates(
