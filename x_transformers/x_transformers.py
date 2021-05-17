@@ -576,7 +576,8 @@ class AttentionLayers(nn.Module):
                 hiddens.append(x)
                 layer_mem = mems.pop(0)
 
-            x = x.detach()
+            if True: # ind != 0:
+                x = x.detach()
             residual = x
 
             if self.pre_norm:
@@ -602,6 +603,7 @@ class AttentionLayers(nn.Module):
             elif layer_type == 'c' and self.cross_residual_attn:
                 prev_cross_attn = inter.pre_softmax_attn
 
+        hiddens.append(x)
         if return_hiddens:
             intermediates = LayerIntermediates(
                 hiddens = hiddens,
