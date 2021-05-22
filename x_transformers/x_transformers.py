@@ -576,6 +576,8 @@ class AttentionLayers(nn.Module):
                 hiddens.append(x)
                 layer_mem = mems.pop(0)
 
+            if True: # ind != 0:
+                x = x.detach()
             residual = x
 
             if self.pre_norm:
@@ -590,17 +592,18 @@ class AttentionLayers(nn.Module):
 
             x = residual_fn(out, residual)
 
+            if not self.pre_norm:
+                x = norm(x)
+
             if layer_type in ('a', 'c'):
-                intermediates.append(inter)
+                intermediates.append(x)
 
             if layer_type == 'a' and self.residual_attn:
                 prev_attn = inter.pre_softmax_attn
             elif layer_type == 'c' and self.cross_residual_attn:
                 prev_cross_attn = inter.pre_softmax_attn
 
-            if not self.pre_norm and not is_last:
-                x = norm(x)
-
+        hiddens.append(x)
         if return_hiddens:
             intermediates = LayerIntermediates(
                 hiddens = hiddens,
@@ -762,7 +765,7 @@ class TransformerWrapper(nn.Module):
         if return_mems:
             hiddens = intermediates.hiddens
             new_mems = list(map(lambda pair: torch.cat(pair, dim = -2), zip(mems, hiddens))) if exists(mems) else hiddens
-            new_mems = list(map(lambda t: t[..., -self.max_mem_len:, :].detach(), new_mems))
+            new_mems = list(map(lambda t: t[..., :, :], new_mems))
             return out, new_mems
 
         if return_attn:
