@@ -253,14 +253,28 @@ class GEGLU(nn.Module):
         x, gate = self.proj(x).chunk(2, dim = -1)
         return x * F.gelu(gate)
 
+class Rup(nn.Module):
+    def __init__(self, dim_in, dim_out):
+        super().__init__()
+        self.proj = nn.Linear(dim_in, dim_out)
+
+    def forward(self, x):
+        x = self.proj(x)
+        x = F.relu(x)
+        return 2 ** x		
+
+GEGLU = Rup
+GELU = Rup
+
 class FeedForward(nn.Module):
     def __init__(self, dim, dim_out = None, mult = 4, glu = False, dropout = 0.):
         super().__init__()
         inner_dim = int(dim * mult)
         dim_out = default(dim_out, dim)
+        glu = True
         project_in = nn.Sequential(
             nn.Linear(dim, inner_dim),
-            nn.GELU()
+            GELU()
         ) if not glu else GEGLU(dim, inner_dim)
 
         self.net = nn.Sequential(
@@ -576,7 +590,7 @@ class AttentionLayers(nn.Module):
                 hiddens.append(x)
                 layer_mem = mems.pop(0)
 
-            if True: # ind != 0:
+            if ind != 0:
                 x = x.detach()
             residual = x
 
@@ -603,7 +617,6 @@ class AttentionLayers(nn.Module):
             elif layer_type == 'c' and self.cross_residual_attn:
                 prev_cross_attn = inter.pre_softmax_attn
 
-        hiddens.append(x)
         if return_hiddens:
             intermediates = LayerIntermediates(
                 hiddens = hiddens,

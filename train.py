@@ -39,7 +39,7 @@ def decode_tokens(tokens):
 model = TransformerWrapper(
     num_tokens = 256,
     max_seq_len = SEQ_LEN,
-    attn_layers = Decoder(dim = 128, depth = 6, heads = 4),
+    attn_layers = Decoder(dim = 256, depth = 6, heads = 4),
 #    return_mems=True
 )
 
